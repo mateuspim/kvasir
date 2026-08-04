@@ -1,0 +1,4 @@
+.env
+*.gguf
+models/
+logs/

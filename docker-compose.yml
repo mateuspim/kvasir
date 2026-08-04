@@ -1,0 +1,25 @@
+services:
+  llama-swap:
+    image: ghcr.io/mostlygeek/llama-swap:cuda
+    container_name: llama-swap
+    restart: unless-stopped
+    ports:
+      # Loopback only. llama-swap has no auth, so publishing on 0.0.0.0 would
+      # expose an open inference endpoint to the LAN. Drop the 127.0.0.1 prefix
+      # only if you deliberately want other machines to reach it -- and put
+      # Caddy with basic auth in front of it first, as the ComfyUI project does.
+      - "127.0.0.1:${LLAMA_SWAP_PORT:-8080}:8080"
+    gpus: all
+    environment:
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+    volumes:
+      - ${MODELS_DIR:-/mnt/FastGames/llm-models}:/models:ro
+      - ./config/llama-swap.yaml:/app/config.yaml:ro
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
