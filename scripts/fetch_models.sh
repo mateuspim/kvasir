@@ -6,6 +6,7 @@ set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONF="${REPO_DIR}/models.conf"
+# shellcheck source=/dev/null  # .env is user-created at runtime
 [ -f "${REPO_DIR}/.env" ] && source "${REPO_DIR}/.env"
 MODELS_DIR="${MODELS_DIR:-/mnt/FastGames/llm-models}"
 

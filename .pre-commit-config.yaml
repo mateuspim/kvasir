@@ -1,0 +1,30 @@
+# Fast, offline, no-GPU checks. Anything needing the GPU (`make tune`) is
+# deliberately NOT a hook -- it takes minutes and requires an idle card.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v6.0.0
+    hooks:
+      - id: check-yaml
+      - id: check-json
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+      - id: check-merge-conflict
+      - id: check-executables-have-shebangs
+      - id: check-added-large-files
+        # Weights live in $MODELS_DIR and must never be committed; .gitignore
+        # already excludes *.gguf, this is the backstop if that is edited.
+        args: ["--maxkb=512"]
+
+  - repo: https://github.com/shellcheck-py/shellcheck-py
+    rev: v0.11.0.1
+    hooks:
+      - id: shellcheck
+
+  - repo: local
+    hooks:
+      - id: config-tests
+        name: llama-swap config tests
+        entry: scripts/test_config.sh
+        language: script
+        pass_filenames: false
+        always_run: true

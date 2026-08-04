@@ -12,6 +12,7 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# shellcheck source=/dev/null  # .env is user-created at runtime
 [ -f "${REPO_DIR}/.env" ] && source "${REPO_DIR}/.env"
 MODELS_DIR="${MODELS_DIR:-/mnt/FastGames/llm-models}"
 IMAGE="${IMAGE:-ghcr.io/mostlygeek/llama-swap:cuda}"
@@ -106,6 +107,7 @@ done
 printf '\n'
 if [ -n "$best_n" ]; then
   grn "Best: --spec-draft-n-max ${best_n} at ${best_ts} tok/s"
+  # shellcheck disable=SC2016  # backticks are literal text in help output
   printf 'Set it in config/llama-swap.yaml, then `make restart`.\n'
   printf 'Record the full sweep in CLAUDE.md so the choice stays justified.\n'
 else

@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help up down restart logs status pull models tune bench shell curl-test du clean
+.PHONY: help up down restart logs status pull models tune bench shell curl-test du clean test lint
 
 -include .env
 export
@@ -24,7 +24,16 @@ help:
 	  'tune'       'Sweep --n-cpu-moe and MTP draft depth, report the optimum' \
 	  'bench'      'Benchmark the primary model at current settings' \
 	  'curl-test'  'Send a tool-calling request end to end' \
+	  'test'       'Run config tests (fast, offline, no GPU)' \
+	  'lint'       'Run every pre-commit hook over all files' \
 	  'shell'      'Open a shell inside the container'
+
+test:
+	@chmod +x scripts/test_config.sh
+	@./scripts/test_config.sh
+
+lint:
+	@pre-commit run --all-files
 
 up:
 	docker compose up -d
