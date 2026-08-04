@@ -11,6 +11,31 @@ agent and its subagents can each use a different model through one URL.
 
 Endpoint: `http://localhost:8080/v1`
 
+## Tests
+
+```bash
+make test    # config tests: fast, offline, no GPU
+make lint    # every pre-commit hook over all files
+```
+
+Hooks are installed (`pre-commit install`) and run on every commit. They are
+deliberately all fast and offline — `make tune` is **not** a hook, because it
+needs minutes and an idle GPU.
+
+`scripts/test_config.sh` checks the failure modes this project actually hit,
+not hypothetical ones:
+
+| Test | Regression it catches |
+|------|----------------------|
+| referenced files exist on disk | a model advertised with no weights — llama-swap starts fine, then 500s on every request to it |
+| no `--n-gpu-layers` / `--n-cpu-moe` | re-adding either makes llama.cpp abandon its own memory fitting and OOM at 128K |
+| loopback-only publish | exposing an unauthenticated inference endpoint to the LAN |
+| YAML/compose validity, `bash -n`, https URLs | ordinary breakage |
+
+All four regression paths were verified to actually fail the suite, and a real
+bad commit was confirmed blocked. A test that cannot fail is worth nothing —
+if you add one, prove it catches its bug before trusting it.
+
 ## Common Commands
 
 ```bash
