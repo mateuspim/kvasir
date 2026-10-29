@@ -1,78 +1,79 @@
 # local-llm-stack
 
-A local, OpenAI-compatible LLM endpoint for coding agents — one `llama-swap`
-container fronting several GGUF models, hot-swapped on demand, wired into
+A local, OpenAI-compatible LLM endpoint for coding agents — one
+[Strata](https://github.com/Niko1221/Strata) container serving
+**Qwen3.8 Flash-Next** (125B MoE, ~6B active) on a 16 GB card, wired into
 [opencode](https://opencode.ai).
 
-Built and tuned for a **16 GB card**, which is the constraint that drives almost
-every decision here.
+Model choice follows Akita's
+[llm-opensource-benchmark](https://github.com/akitaonrails/llm-opensource-benchmark):
+Q2_0 matched IQ3_S on his hard coding canary (36/36 hidden tests, 3 of 3 runs)
+and is the fastest quant everywhere he measured it.
 
 ## Measured on this hardware
 
-RTX 4080 (16 GB) · Ryzen 9 9900X · 60 GB RAM · llama.cpp b10236
+RTX 4080 (16 GB) · Ryzen 9 9900X · 60 GB RAM · Strata image 0.2.7-cuda13 (engine 0.1.52)
 
-| Model | Context | VRAM | Generation |
-|-------|---------|------|-----------|
-| Qwen3.6-35B-A3B Q4_K_XL + MTP | 131072 | 14.2 GB | **87–93 tok/s** |
-| gpt-oss-20b MXFP4 + eagle3 | 65536 | ~13.5 GB | **221 tok/s** |
+| Prompt | TTFT | Prefill | Decode |
+|--------|------|---------|--------|
+| ~5.3K tokens | 1.6 s | ~3,400 tok/s | **126–131 tok/s** |
+| ~41K tokens | 11.3 s | ~3,600 tok/s | **113–122 tok/s** |
 
-Both do tool calling; the Qwen also does vision.
+Q2_0, 128K context, int8 KV, MTP speculative decoding. 15.6/16.4 GB VRAM,
+~36 GB RAM. Decode is an upper bound: the benchmark filler is repetitive code,
+which MTP drafts unusually well.
+
+**Coding quality:** 100/100 on Akita's hard canary (36/36 hidden tests, 4 turns,
+up to ~113K tokens of context) in 14.8 min — the same score as his 5090, at
+about half the speed.
+
+For comparison, the previous llama-swap stack ran Qwen3.6-35B-A3B at 87–93
+tok/s on the same card.
 
 ## Quick start
 
 ```bash
-cp .env.example .env      # set MODELS_DIR
-make models               # ~36 GB of weights
-make up                   # endpoint on 127.0.0.1:8080/v1
+cp .env.example .env      # paths must be absolute (pkexec)
+make key                  # API key -> ~/.config/local-llm/strata.key, mode 600
+make plan                 # dry run: what would download, changes nothing
+make up                   # first start downloads ~72 GB, builds a ~38 GB pack
 make status
 ```
 
 ```bash
 make test                 # config tests (fast, offline, no GPU)
-make tune                 # measure the best draft depth (needs an idle GPU)
+make bench                # speed canary (needs an idle GPU)
 ```
 
-## Four things that cost real time to work out
+## Four things worth knowing
 
-**Do not set `--n-gpu-layers` or `--n-cpu-moe`.** Setting either makes llama.cpp
-abandon its own memory fitting — it logs `n_gpu_layers already set by user,
-abort` — and fall back to your hard-coded value, which OOMs at 128K context.
-Left alone, `common_fit_params` computes the split at load time and lands at
-14.2/16.4 GB with the full window. There is a test guarding this.
+**Docker runs through `pkexec`, never the docker group.** Membership in
+`docker` is root-equivalent. Every target that touches docker prompts via
+polkit instead. pkexec drops the environment, which is why `.env` must hold
+absolute paths — there is a test for it.
 
-**Pick the MoE, not the dense model.** Qwen3.6-27B scores higher on paper (77.2
-vs 73.4 SWE-bench Verified) but reads all 27B params per token, so it cannot
-spill to RAM cheaply. The 35B-A3B activates ~3B per token and wins decisively on
-a 16 GB card. Published tok/s figures for these models are usually RTX 5090
-numbers — assume roughly a third of them here.
+**Keep the data on NVMe.** Strata leaves a 29 GB lookup shard on disk and reads
+rows from it *during generation*, not only at load. A SATA SSD costs decode
+speed, not just startup time.
 
-**Long context is cheap on this architecture.** Only 10 of 40 layers keep a KV
-cache; the other 30 are Gated DeltaNet with fixed-size state. The full 128K
-window costs ~1.4 GB, roughly a quarter of what a conventional transformer of
-this size would need. Shrinking the context to free VRAM is not worth it.
+**RAM is the tight resource, not VRAM.** Q2_0 keeps ~34 GB of experts in RAM,
+leaving ~9 GB free on a 60 GB box. A big browser session or a game alongside it
+can trigger the OOM killer. IQ3_XXS (43 GB of experts) still fits, with less
+margin.
 
-**Speculative decoding peaks early.** Deeper drafts get rejected faster than
-they pay for themselves — `eagle3` at depth 5 is *slower than no speculation at
-all*. Measured optima: MTP depth 2 for the Qwen, eagle3 depth 3 for gpt-oss.
-
-## Benchmarking
-
-Measurements taken while anything else holds VRAM come out **3–8× too low** and
-still look plausible. `scripts/tune.sh` refuses to run above 500 MiB of GPU use,
-and averages several samples per setting because single runs vary by ~10% —
-enough to pick the wrong value outright.
+**opencode 2.2's background service defaults to port 49374** — the same port
+the ai-memory server uses. `opencode run` then dies with "Managed service port
+49374 … already in use". Fixed with `opencode service set port 49380`.
 
 ## Layout
 
 | Path | Purpose |
 |------|---------|
-| `config/llama-swap.yaml` | model definitions, per-model llama-server flags |
-| `models.conf` | INI download manifest, `filename = url` |
-| `scripts/fetch_models.sh` | resumable, size-verified downloads |
-| `scripts/tune.sh` | draft-depth sweep with a GPU-idle guard |
+| `docker-compose.yml` | the `strata` service: pinned image, loopback port, key as a secret |
+| `.env.example` | data dir, key file, model selection |
+| `scripts/speed.py` | Akita-style speed canary (cold prompts, 256 tokens out) |
 | `scripts/test_config.sh` | config tests, also run as a pre-commit hook |
-| `CLAUDE.md` | full notes, including the opencode-side gotchas |
+| `CLAUDE.md` | full notes, including the opencode-side config |
 
-Weights are never committed — they live in `$MODELS_DIR`, bind-mounted
-read-only. `.gitignore` excludes `*.gguf` and pre-commit caps file size as a
-backstop.
+Weights never touch the repo: they live in `$STRATA_DATA_DIR`. `.gitignore`
+excludes `*.gguf` and pre-commit caps file size as a backstop.

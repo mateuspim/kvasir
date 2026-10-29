@@ -1,96 +1,101 @@
 .DEFAULT_GOAL := help
 
-.PHONY: help up down restart logs status pull models tune bench shell curl-test du clean test lint
+.PHONY: help key up down restart logs status pull plan bench curl-test du shell test lint
 
 -include .env
 export
 
-MODELS_DIR    ?= /mnt/FastGames/llm-models
-LLAMA_SWAP_PORT ?= 8080
-IMAGE         ?= ghcr.io/mostlygeek/llama-swap:cuda
-ENDPOINT      := http://localhost:$(LLAMA_SWAP_PORT)
+# Docker runs through pkexec: this user is deliberately NOT in the docker group
+# (membership is root-equivalent). pkexec drops the environment, so compose is
+# given absolute paths and reads its variables from .env, never from the shell.
+DOCKER          ?= pkexec docker
+COMPOSE         := $(DOCKER) compose --project-directory $(CURDIR) \
+                     --env-file $(CURDIR)/.env -f $(CURDIR)/docker-compose.yml
+STRATA_PORT     ?= 8080
+STRATA_KEY_FILE ?= $(HOME)/.config/local-llm/strata.key
+STRATA_IMAGE    ?= ghcr.io/niko1221/strata:0.2.7-cuda13
+ENDPOINT        := http://127.0.0.1:$(STRATA_PORT)
+AUTH             = -H "Authorization: Bearer $$(cat $(STRATA_KEY_FILE))"
 
 help:
-	@printf '%s\n' 'llama-swap helper targets:'
+	@printf '%s\n' 'strata helper targets:'
 	@printf '  %-14s %s\n' \
-	  'up'         'Start the stack (detached)' \
+	  'key'        'Create the API key file (once; never overwrites)' \
+	  'up'         'Start the stack (first start downloads ~72 GB)' \
 	  'down'       'Stop the stack' \
-	  'restart'    'Recreate the container (after config edits)' \
-	  'logs'       'Follow llama-swap logs' \
-	  'status'     'Show container state, GPU use, and loaded models' \
-	  'pull'       'Pull the latest llama-swap:cuda image' \
-	  'models'     'Download every enabled model in models.conf' \
-	  'du'         'Show disk used by downloaded models' \
-	  'tune'       'Sweep --n-cpu-moe and MTP draft depth, report the optimum' \
-	  'bench'      'Benchmark the primary model at current settings' \
+	  'restart'    'Recreate the container (after .env edits)' \
+	  'logs'       'Follow Strata logs' \
+	  'status'     'GPU/RAM use and the model the endpoint serves' \
+	  'pull'       'Pull the pinned image' \
+	  'plan'       'Dry run: what MODEL/CONTEXT would download, changes nothing' \
+	  'bench'      'Speed canary: cold ~5K and ~41K prompts, 256 tokens out' \
 	  'curl-test'  'Send a tool-calling request end to end' \
+	  'du'         'Show disk used by model data' \
 	  'test'       'Run config tests (fast, offline, no GPU)' \
 	  'lint'       'Run every pre-commit hook over all files' \
 	  'shell'      'Open a shell inside the container'
 
 test:
-	@chmod +x scripts/test_config.sh
 	@./scripts/test_config.sh
 
 lint:
 	@pre-commit run --all-files
 
+key:
+	@test -s $(STRATA_KEY_FILE) && echo "exists: $(STRATA_KEY_FILE)" || { \
+	  mkdir -p $(dir $(STRATA_KEY_FILE)) && chmod 700 $(dir $(STRATA_KEY_FILE)) && \
+	  (umask 077; openssl rand -hex 24 | tr -d '\n' > $(STRATA_KEY_FILE)) && \
+	  echo "created: $(STRATA_KEY_FILE)"; }
+
 up:
-	docker compose up -d
-	@echo "Endpoint: $(ENDPOINT)/v1  ->  models: $(ENDPOINT)/v1/models"
+	@test -f .env || { echo 'no .env: cp .env.example .env'; exit 1; }
+	@test -s $(STRATA_KEY_FILE) || { echo 'no key file: make key'; exit 1; }
+	$(COMPOSE) up -d
+	@echo "Endpoint: $(ENDPOINT)/v1  (first start: watch with make logs)"
 
 down:
-	docker compose down
+	$(COMPOSE) down
 
 restart:
-	docker compose up -d --force-recreate
+	$(COMPOSE) up -d --force-recreate
 
 logs:
-	docker compose logs -f llama-swap
+	$(COMPOSE) logs -f strata
 
 status:
-	@docker compose ps
 	@echo '--- GPU ---'
 	@nvidia-smi --query-gpu=memory.used,memory.total,utilization.gpu \
 	   --format=csv,noheader
-	@echo '--- models known to llama-swap ---'
-	@curl -s $(ENDPOINT)/v1/models | python -c \
+	@echo '--- RAM ---'
+	@free -g | sed -n 2p
+	@echo '--- served model ---'
+	@curl -sf $(AUTH) $(ENDPOINT)/v1/models | python -c \
 	   'import json,sys; [print(" ",m["id"]) for m in json.load(sys.stdin)["data"]]' \
-	   2>/dev/null || echo '  (not running)'
+	   2>/dev/null || echo '  (not serving yet)'
 
 pull:
-	docker pull $(IMAGE)
+	$(DOCKER) pull $(STRATA_IMAGE)
 
-models:
-	@chmod +x scripts/fetch_models.sh
-	@./scripts/fetch_models.sh
+plan:
+	$(DOCKER) run --rm --gpus all -v $(STRATA_DATA_DIR):/data $(STRATA_IMAGE) \
+	  strata launch --plan --family $(FAMILY) --model $(MODEL) \
+	  --context $(CONTEXT) --data-dir /data/Strata-data
 
-du:
-	@du -sh $(MODELS_DIR) 2>/dev/null || echo 'no models yet'
-	@ls -lh $(MODELS_DIR)/*.gguf 2>/dev/null | awk '{printf "  %-46s %s\n", $$9, $$5}' || true
-
-tune:
-	@chmod +x scripts/tune.sh
-	@./scripts/tune.sh
-
-# Raw benchmark of the primary model, bypassing llama-swap.
-# NOTE: this image ships the unified `llama` CLI, not a standalone llama-bench.
+# The filler is repetitive code, which MTP drafts unusually well: treat decode
+# figures as an upper bound for real agent work.
 bench:
-	docker run --rm --gpus all -v $(MODELS_DIR):/models:ro \
-	  --entrypoint /app/llama $(IMAGE) bench \
-	  -m /models/Qwen3.6-35B-A3B-UD-Q4_K_XL.gguf \
-	  -ngl 999 -ncmoe 18 -fa on -p 512 -n 128
+	@KEY=$$(cat $(STRATA_KEY_FILE)) python3 scripts/speed.py 200 2800 2800 22000 22000
 
 # Exercises the path that actually matters for agents: tool calling over the
 # OpenAI-compatible endpoint. A model that chats fine can still fail here.
 curl-test:
-	@curl -s $(ENDPOINT)/v1/chat/completions \
+	@curl -s $(AUTH) $(ENDPOINT)/v1/chat/completions \
 	  -H 'Content-Type: application/json' \
-	  -d '{"model":"qwen3.6-35b","messages":[{"role":"user","content":"What is 17*23? Use the calculator tool."}],"tools":[{"type":"function","function":{"name":"calculator","description":"Evaluate an arithmetic expression","parameters":{"type":"object","properties":{"expr":{"type":"string"}},"required":["expr"]}}}]}' \
+	  -d '{"model":"qwen3.8-flash-next-$(shell echo $(MODEL) | tr A-Z a-z)","messages":[{"role":"user","content":"What is 17*23? Use the calculator tool."}],"tools":[{"type":"function","function":{"name":"calculator","description":"Evaluate an arithmetic expression","parameters":{"type":"object","properties":{"expr":{"type":"string"}},"required":["expr"]}}}]}' \
 	  | python -m json.tool
 
-shell:
-	docker compose exec llama-swap /bin/sh
+du:
+	@du -sh $(STRATA_DATA_DIR)/Strata-data/* 2>/dev/null || echo 'no model data yet'
 
-clean:
-	docker compose down -v
+shell:
+	$(COMPOSE) exec strata /bin/sh

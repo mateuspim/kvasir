@@ -1,25 +1,35 @@
 services:
-  llama-swap:
-    image: ghcr.io/mostlygeek/llama-swap:cuda
-    container_name: llama-swap
+  strata:
+    # Pinned on purpose: the image only changes when this tag does.
+    image: ${STRATA_IMAGE:-ghcr.io/niko1221/strata:0.2.7-cuda13}
+    container_name: strata
     restart: unless-stopped
     ports:
-      # Loopback only. llama-swap has no auth, so publishing on 0.0.0.0 would
-      # expose an open inference endpoint to the LAN. Drop the 127.0.0.1 prefix
-      # only if you deliberately want other machines to reach it -- and put
-      # Caddy with basic auth in front of it first, as the ComfyUI project does.
-      - "127.0.0.1:${LLAMA_SWAP_PORT:-8080}:8080"
+      # Loopback only. Strata always requires an API key, but there is still no
+      # reason to offer the endpoint to the LAN.
+      - "127.0.0.1:${STRATA_PORT:-8080}:8080"
     gpus: all
     environment:
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      FAMILY: ${FAMILY:-qwen}
+      MODEL: ${MODEL:-Q2_0}
+      CONTEXT: ${CONTEXT:-128k}
+      KV: ${KV:-int8}
+      VISION: ${VISION:-on}
+      TUNE: ${TUNE:-skip}
+      # Read from a secret file so the key never sits in .env or `docker inspect`.
+      API_KEY_FILE: /run/secrets/strata_key
+    secrets:
+      - strata_key
     volumes:
-      - ${MODELS_DIR:-/mnt/FastGames/llm-models}:/models:ro
-      - ./config/llama-swap.yaml:/app/config.yaml:ro
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: all
-              capabilities: [gpu]
+      # Bind mount, not a named volume: model plus prepared pack is ~105 GB and
+      # named volumes live on the root disk. Keep it on NVMe -- Strata reads the
+      # 29 GB lookup shard from here while generating, not just at load.
+      - ${STRATA_DATA_DIR:?set STRATA_DATA_DIR in .env}:/data
+    ulimits:
+      memlock: { soft: -1, hard: -1 }   # the engine pins tens of GB of RAM
+    shm_size: 2gb
+    stop_grace_period: 2m               # drains and unloads the model on stop
+
+secrets:
+  strata_key:
+    file: ${STRATA_KEY_FILE:?set STRATA_KEY_FILE in .env}

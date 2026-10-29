@@ -23,7 +23,7 @@ repos:
   - repo: local
     hooks:
       - id: config-tests
-        name: llama-swap config tests
+        name: strata config tests
         entry: scripts/test_config.sh
         language: script
         pass_filenames: false
