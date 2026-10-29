@@ -9,7 +9,7 @@ override, a Makefile, and two scripts. The model server is
 
 | Part | Role |
 | --- | --- |
-| `Makefile` | The entry point. Reads `.env`, invokes docker as `$(DOCKER)` (default `pkexec docker`), and refuses to start when `.env`, the key file or the data directory is missing. |
+| `Makefile` | The entry point. Reads `.env`, invokes docker as `$(DOCKER)` (plain `docker`, `pkexec docker` or `sudo docker`, detected), and refuses to start when `.env`, the key file or the data directory is missing. |
 | `docker-compose.yml` | The `strata` service: pinned image, loopback-only port, model settings as environment variables, the key as a secret, `/data` as a bind mount. |
 | `compose/nvidia.yml`, `compose/amd.yml` | GPU access for each vendor, chosen by `GPU_VENDOR`. |
 | `ghcr.io/niko1221/strata` image | Strata's Terminal plus one GPU engine package. Its entrypoint turns the environment into `strata launch --no-tui`. |

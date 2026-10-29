@@ -1,6 +1,6 @@
 # 3. Reach docker through pkexec, not the docker group
 
-- Status: Accepted
+- Status: Superseded by [ADR 8](0008-detect-how-to-reach-docker.md)
 - Date: 2026-10-29 (documented from the code)
 
 ## Context

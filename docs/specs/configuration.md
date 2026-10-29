@@ -2,7 +2,7 @@
 
 Everything is configured in `.env`, created from `.env.example` by `make env`.
 The Makefile includes it, and compose reads it with an absolute `--env-file`
-path. Because the default `DOCKER=pkexec docker` resets the environment,
+path. When docker runs through pkexec or sudo, the environment is reset, so
 variables exported in your shell are **not** seen by compose: put them in
 `.env`.
 
@@ -16,7 +16,7 @@ variables exported in your shell are **not** seen by compose: put them in
 | `GPU_VENDOR` | `nvidia` | no | Picks `compose/<vendor>.yml`: `nvidia` or `amd`. |
 | `STRATA_IMAGE` | `ghcr.io/niko1221/strata:0.2.7-cuda13` | no | Pinned image ([ADR 6](../adr/0006-pin-the-image-tag.md)). Pick the flavor for your card in the [hardware guide](../guide/hardware.md). |
 | `RENDER_GID` | the host's `render` group id (written by `make env`) | AMD only | Numeric group id passed to the container for `/dev/dri`. |
-| `DOCKER` | `pkexec docker` | no | How docker is invoked ([ADR 3](../adr/0003-reach-docker-through-pkexec.md)). |
+| `DOCKER` | detected: `docker`, else `pkexec docker`, else `sudo docker` | no | How docker is invoked; `make help` shows the choice ([ADR 8](../adr/0008-detect-how-to-reach-docker.md)). |
 | `FAMILY` | `qwen` | no | Strata model family: `qwen`, `coder`, `swift`, … |
 | `MODEL` | `Q2_0` | no | Size within the family: `Q2_0`, `IQ2_XS`, `IQ3_XXS`, `IQ3_S`, … Also forms the model id. |
 | `CONTEXT` | `128k` | no | `32k`, `64k`, `128k`, `256k` or a token count. |
