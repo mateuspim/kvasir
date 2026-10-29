@@ -1,6 +1,6 @@
 # Architecture
 
-local-llm-stack has no application code of its own. It is the configuration
+Kvasir has no application code of its own. It is the configuration
 that runs one upstream container safely and repeatably: a compose file, a GPU
 override, a Makefile, and two scripts. The model server is
 [Strata](https://github.com/Niko1221/Strata), from its official image.

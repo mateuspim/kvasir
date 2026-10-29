@@ -15,7 +15,7 @@ the provider yourself.
       "name": "Strata (local)",
       "options": {
         "baseURL": "http://127.0.0.1:8080/v1",
-        "apiKey": "{file:~/.config/local-llm/strata.key}"
+        "apiKey": "{file:~/.config/kvasir/strata.key}"
       },
       "models": {
         "qwen3.8-flash-next-q2_0": {

@@ -11,7 +11,7 @@ variables exported in your shell are **not** seen by compose: put them in
 | Variable | Default | Required | Meaning |
 | --- | --- | --- | --- |
 | `STRATA_DATA_DIR` | `/srv/strata-data` | yes | Absolute host path mounted at `/data`. Holds GGUFs, the prepared pack, the MTP draft, presets and logs (~105 GB for Q2_0). Must exist before `make up`. Put it on NVMe ([ADR 5](../adr/0005-keep-model-data-on-nvme.md)). |
-| `STRATA_KEY_FILE` | `$HOME/.config/local-llm/strata.key` (written by `make env`) | yes | Absolute path of the API key file, one line, mode 0600. Mounted as the compose secret `strata_key`. |
+| `STRATA_KEY_FILE` | `$HOME/.config/kvasir/strata.key` (written by `make env`) | yes | Absolute path of the API key file, one line, mode 0600. Mounted as the compose secret `strata_key`. |
 | `STRATA_PORT` | `8080` | no | Host port, always bound to `127.0.0.1`. |
 | `GPU_VENDOR` | `nvidia` | no | Picks `compose/<vendor>.yml`: `nvidia` or `amd`. |
 | `STRATA_IMAGE` | `ghcr.io/niko1221/strata:0.2.7-cuda13` | no | Pinned image ([ADR 6](../adr/0006-pin-the-image-tag.md)). Pick the flavor for your card in the [hardware guide](../guide/hardware.md). |

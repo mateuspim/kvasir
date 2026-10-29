@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Rename the project to Kvasir. The repository moves to
+  `github.com/mateuspim/kvasir` (GitHub redirects the old URL), the default
+  key path for new installs becomes `~/.config/kvasir/strata.key`, and the
+  compose project is pinned to the name `kvasir`.
+  **Existing installs:** an `.env` that sets `STRATA_KEY_FILE` keeps working.
+  The running container belongs to the old compose project, so remove it
+  once with `pkexec docker rm -f strata`, then `make up`; model data is kept.
 - Serve Qwen3.8 Flash-Next Q2_0 with the official Strata image instead of
   llama-swap and llama.cpp. Measured on an RTX 4080 with 60 GB of RAM:
   113-131 tok/s decode, and 100/100 (36/36 hidden tests) on Akita's hard

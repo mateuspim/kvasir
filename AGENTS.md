@@ -1,9 +1,9 @@
-# local-llm-stack agent instructions
+# Kvasir agent instructions
 
-local-llm-stack runs a local, OpenAI-compatible LLM endpoint for coding agents:
+Kvasir runs a local, OpenAI-compatible LLM endpoint for coding agents:
 one [Strata](https://github.com/Niko1221/Strata) container, driven by Docker
 Compose and a Makefile, serving Qwen3.8 Flash-Next on a consumer GPU. Public at
-https://github.com/mateuspim/local-llm-stack. The README is the user manual;
+https://github.com/mateuspim/kvasir. The README is the user manual;
 `docs/architecture.md` says how the parts fit, `docs/adr/` why, `docs/specs/`
 what the contracts are, `docs/guide/` how to use each piece.
 
@@ -13,7 +13,7 @@ what the contracts are, `docs/guide/` how to use each piece.
   access and is chosen by `GPU_VENDOR`; `Makefile` is the only entry point
   people should need; `scripts/` holds the config tests and the speed canary.
   There is no application code: behaviour lives in the upstream image.
-- Naming: container and compose service `strata`; variables are the ones in
+- Naming: compose project `kvasir`; container and compose service `strata`; variables are the ones in
   `.env.example` and [docs/specs/configuration.md](docs/specs/configuration.md);
   model ids are `qwen3.8-flash-next-<model lowercased>`.
 - Docker only through `$(DOCKER)`, default `pkexec docker`. Never add a user to

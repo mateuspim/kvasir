@@ -31,7 +31,7 @@
   </g>
 </g>
 <g font-family="JetBrainsMono Nerd Font,JetBrains Mono,monospace">
-  <text x="474" y="590" font-size="150" font-weight="700" letter-spacing="-6" fill="#eff4f7">local-llm-<tspan fill="#b48cff">stack</tspan></text>
+  <text x="478" y="616" font-size="242" font-weight="700" letter-spacing="-8" fill="#b48cff">Kvasir</text>
   <text x="208" y="836" font-size="88" font-weight="700" fill="#e9f0f5">A local model for your agents.</text>
   <text x="208" y="952" font-size="48" fill="#9ca9b4">A 125B MoE coding model on a 16 GB card.</text>
   <text x="208" y="1020" font-size="48" fill="#9ca9b4">Pinned Strata image, keyed and on loopback.</text>
