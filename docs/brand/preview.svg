@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="3840" height="2160" viewBox="0 0 3840 2160">
+<defs>
+  <linearGradient id="background" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#0b1015"/><stop offset=".58" stop-color="#0a111b"/><stop offset="1" stop-color="#102236"/>
+  </linearGradient>
+  <radialGradient id="accentGlow" cx="0" cy="1" r="1">
+    <stop offset="0" stop-color="#8f6ae6" stop-opacity=".27"/><stop offset=".64" stop-color="#8f6ae6" stop-opacity="0"/>
+  </radialGradient>
+  <radialGradient id="blueGlow" cx="1" cy="0" r="1">
+    <stop offset="0" stop-color="#264d78" stop-opacity=".27"/><stop offset=".7" stop-color="#264d78" stop-opacity="0"/>
+  </radialGradient>
+  <pattern id="dots" width="56" height="56" patternUnits="userSpaceOnUse">
+    <circle cx="5" cy="5" r="2.4" fill="#7a8f9d" opacity=".16"/>
+  </pattern>
+  <linearGradient id="line" x1="0" x2="1"><stop stop-color="#b48cff"/><stop offset="1" stop-color="#b48cff" stop-opacity="0"/></linearGradient>
+  <filter id="shadow" x="-.2" y="-.2" width="1.5" height="1.6"><feGaussianBlur stdDeviation="45"/></filter>
+</defs>
+<rect width="3840" height="2160" fill="url(#background)"/>
+<rect width="3840" height="2160" fill="url(#accentGlow)"/>
+<rect width="3840" height="2160" fill="url(#blueGlow)"/>
+<rect width="3840" height="2160" fill="url(#dots)"/>
+<rect x="0" y="0" width="3840" height="2160" fill="#070b0f" opacity=".13"/>
+<!-- The icon paths are inlined so the standalone SVG renders without external references. -->
+<g transform="translate(198 418) scale(0.90625)">
+  <rect x="5" y="5" width="246" height="246" rx="48" fill="#171328" stroke="#b48cff" stroke-width="6"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 50 206 92 128 134 50 92Z" fill="#b48cff" stroke="#b48cff" stroke-width="10"/>
+    <path d="M104 78 120 92 104 106M128 106H152" stroke="#171328" stroke-width="12"/>
+    <path d="M50 130 128 172 206 130" stroke="#8f6ae6" stroke-width="16"/>
+    <path d="M50 166 128 208 206 166" stroke="#6a4bb8" stroke-width="16"/>
+  </g>
+</g>
+<g font-family="JetBrainsMono Nerd Font,JetBrains Mono,monospace">
+  <text x="474" y="590" font-size="150" font-weight="700" letter-spacing="-6" fill="#eff4f7">local-llm-<tspan fill="#b48cff">stack</tspan></text>
+  <text x="208" y="836" font-size="88" font-weight="700" fill="#e9f0f5">A local model for your agents.</text>
+  <text x="208" y="952" font-size="48" fill="#9ca9b4">A 125B MoE coding model on a 16 GB card.</text>
+  <text x="208" y="1020" font-size="48" fill="#9ca9b4">Pinned Strata image, keyed and on loopback.</text>
+  <g font-size="34" fill="#e6edf0">
+    <rect x="208" y="1115" width="475" height="104" fill="#101b22" stroke="#35454d" stroke-width="3"/>
+    <circle cx="250" cy="1167" r="11" fill="#b48cff"/><text x="280" y="1179">Qwen3.8 Flash-Next</text>
+    <rect x="705" y="1115" width="455" height="104" fill="#101b22" stroke="#35454d" stroke-width="3"/>
+    <circle cx="747" cy="1167" r="11" fill="#b48cff"/><text x="777" y="1179">OpenAI-compatible</text>
+    <rect x="208" y="1240" width="394" height="104" fill="#101b22" stroke="#35454d" stroke-width="3"/>
+    <circle cx="250" cy="1292" r="11" fill="#b48cff"/><text x="280" y="1304">opencode-ready</text>
+    <rect x="624" y="1240" width="353" height="104" fill="#101b22" stroke="#35454d" stroke-width="3"/>
+    <circle cx="666" cy="1292" r="11" fill="#b48cff"/><text x="696" y="1304">NVIDIA + AMD</text>
+    <rect x="999" y="1240" width="414" height="104" fill="#101b22" stroke="#35454d" stroke-width="3"/>
+    <circle cx="1041" cy="1292" r="11" fill="#b48cff"/><text x="1071" y="1304">No docker group</text>
+  </g>
+  <rect x="208" y="1460" width="1260" height="152" fill="#0b1218" stroke="#3c505c" stroke-width="3"/>
+  <text x="263" y="1558" font-size="60" fill="#b48cff">$</text>
+  <text x="350" y="1558" font-size="60" fill="#e8eff4">make env key up</text>
+  <path d="M209 1732H1395" stroke="url(#line)" stroke-width="5"/>
+  <text x="208" y="1815" font-size="36" letter-spacing="3" fill="#71838f">LINUX  /  DOCKER  /  STRATA  /  OPENCODE</text>
+</g>
+<!-- Terminal cards drawn from real output (make bench, hard canary report), not screen captures. -->
+<g transform="translate(1980 250) rotate(-4 790 430)" font-family="JetBrainsMono Nerd Font,JetBrains Mono,monospace" font-size="40" xml:space="preserve">
+  <rect x="30" y="42" width="1580" height="830" rx="22" fill="#000" opacity=".55" filter="url(#shadow)"/>
+  <rect width="1580" height="820" rx="18" fill="#11161c" stroke="#516371" stroke-width="7"/>
+  <rect x="4" y="4" width="1572" height="80" rx="14" fill="#18202a"/>
+  <circle cx="60" cy="44" r="13" fill="#e05d5d"/><circle cx="104" cy="44" r="13" fill="#e0b25d"/><circle cx="148" cy="44" r="13" fill="#5dd08a"/>
+  <text x="790" y="57" text-anchor="middle" font-size="34" fill="#71838f">make bench</text>
+  <text x="70" y="180" fill="#b48cff">$ <tspan fill="#e8eff4">make bench</tspan></text>
+  <g fill="#c9d3da">
+    <text x="70" y="262">prompt   490 tok │ TTFT  1.1s │ <tspan fill="#e8eff4">114.2 tok/s</tspan></text>
+    <text x="70" y="330">prompt  5350 tok │ TTFT  1.6s │ <tspan fill="#e8eff4">126.1 tok/s</tspan></text>
+    <text x="70" y="398">prompt  5346 tok │ TTFT  1.6s │ <tspan fill="#e8eff4">131.4 tok/s</tspan></text>
+    <text x="70" y="466">prompt 41248 tok │ TTFT 11.3s │ <tspan fill="#e8eff4">112.8 tok/s</tspan></text>
+    <text x="70" y="534">prompt 41251 tok │ TTFT 11.4s │ <tspan fill="#e8eff4">122.1 tok/s</tspan></text>
+  </g>
+  <text x="70" y="640" fill="#b48cff">$ <tspan fill="#e8eff4">make status</tspan></text>
+  <text x="70" y="712" fill="#9ca9b4">  qwen3.8-flash-next-q2_0   VRAM 15.6 / 16.4 GB</text>
+</g>
+<g transform="translate(2110 1080) rotate(3 825 440)" font-family="JetBrainsMono Nerd Font,JetBrains Mono,monospace" font-size="40" xml:space="preserve">
+  <rect x="35" y="47" width="1650" height="870" rx="24" fill="#000" opacity=".67" filter="url(#shadow)"/>
+  <rect width="1650" height="860" rx="19" fill="#11161c" stroke="#5a6e76" stroke-width="7"/>
+  <rect x="4" y="4" width="1642" height="80" rx="15" fill="#18202a"/>
+  <circle cx="60" cy="44" r="13" fill="#e05d5d"/><circle cx="104" cy="44" r="13" fill="#e0b25d"/><circle cx="148" cy="44" r="13" fill="#5dd08a"/>
+  <text x="825" y="57" text-anchor="middle" font-size="34" fill="#71838f">hard canary · opencode · 4 turns</text>
+  <text x="70" y="180" fill="#b48cff">$ <tspan fill="#e8eff4">python3 bench/hard_canary.py …</tspan></text>
+  <g fill="#c9d3da">
+    <text x="70" y="262">turn 1 <tspan fill="#5dd08a">ok</tspan>   turn 2 <tspan fill="#5dd08a">ok</tspan>   turn 3 <tspan fill="#5dd08a">ok</tspan>   turn 4 <tspan fill="#5dd08a">ok</tspan></text>
+    <text x="70" y="352">hidden tests          <tspan fill="#e8eff4">36 / 36</tspan></text>
+    <text x="70" y="420">  spec                15 / 15</text>
+    <text x="70" y="488">  buried context       6 / 6</text>
+    <text x="70" y="556">  rule changes        15 / 15</text>
+    <text x="70" y="624">requirements          20 / 20</text>
+    <text x="70" y="692">wall time             14.8 min</text>
+  </g>
+  <text x="70" y="790" font-weight="700" fill="#e8eff4">quality_score         <tspan fill="#b48cff">100.0</tspan></text>
+</g>
+</svg>

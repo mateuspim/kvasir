@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" role="img" aria-label="local-llm-stack icon: three stacked layers for VRAM, RAM and NVMe">
+  <rect x="5" y="5" width="246" height="246" rx="48" fill="#171328" stroke="#b48cff" stroke-width="6"/>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M128 50 206 92 128 134 50 92Z" fill="#b48cff" stroke="#b48cff" stroke-width="10"/>
+    <path d="M104 78 120 92 104 106M128 106H152" stroke="#171328" stroke-width="12"/>
+    <path d="M50 130 128 172 206 130" stroke="#8f6ae6" stroke-width="16"/>
+    <path d="M50 166 128 208 206 166" stroke="#6a4bb8" stroke-width="16"/>
+  </g>
+</svg>
