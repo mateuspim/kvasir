@@ -3,7 +3,7 @@
 ## Reporting a vulnerability
 
 Please report privately through GitHub's
-[security advisories](https://github.com/mateuspim/local-llm-stack/security/advisories/new)
+[security advisories](https://github.com/mateuspim/kvasir/security/advisories/new)
 rather than a public issue. Include the commit or release, the image tag from
 `.env`, steps to reproduce and impact. You can expect a reply within a week.
 

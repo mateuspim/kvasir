@@ -1,11 +1,11 @@
-# <img src="icon.svg" alt="" width="32" height="32" align="top"> local-llm-stack
+# <img src="icon.svg" alt="" width="32" height="32" align="top"> Kvasir
 
-![local-llm-stack hero graphic with make bench output and a 100/100 hard canary result](preview.png)
+![Kvasir hero graphic with make bench output and a 100/100 hard canary result](preview.png)
 
 **A local, OpenAI-compatible endpoint for coding agents that runs a 125B
 mixture-of-experts model on a 16 GB graphics card.**
 
-local-llm-stack runs [Strata](https://github.com/Niko1221/Strata), from its
+Kvasir runs [Strata](https://github.com/Niko1221/Strata), from its
 official pinned image, serving Qwen3.8 Flash-Next. Strata keeps the most-used
 experts on the card, the rest in RAM, and a lookup shard on NVMe. The model
 choice follows Akita's
@@ -19,8 +19,8 @@ On an RTX 4080 with 60 GB of RAM it decodes at 113-131 tok/s and scored
 ## Quick start
 
 ```sh
-git clone https://github.com/mateuspim/local-llm-stack
-cd local-llm-stack
+git clone https://github.com/mateuspim/kvasir
+cd kvasir
 make env          # .env for this machine; then set STRATA_DATA_DIR (NVMe)
 make key          # API key, mode 600
 make plan         # what would download; changes nothing
@@ -60,7 +60,7 @@ Details and other sizes: [choose hardware and a model](docs/guide/hardware.md).
 ```sh
 make down
 rm -rf "$STRATA_DATA_DIR"            # model data, ~105 GB
-rm ~/.config/local-llm/strata.key    # or your STRATA_KEY_FILE
+rm ~/.config/kvasir/strata.key    # or your STRATA_KEY_FILE
 ```
 
 Nothing else was installed on the host.

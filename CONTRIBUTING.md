@@ -1,6 +1,6 @@
-# Contributing to local-llm-stack
+# Contributing to Kvasir
 
-Thanks for helping. local-llm-stack is a small project; issues and focused
+Thanks for helping. Kvasir is a small project; issues and focused
 pull requests are welcome. Results from hardware the project has not seen yet,
 especially AMD cards, are as useful as code.
 
@@ -14,8 +14,8 @@ especially AMD cards, are as useful as code.
 ## Set up
 
 ```sh
-git clone https://github.com/mateuspim/local-llm-stack
-cd local-llm-stack
+git clone https://github.com/mateuspim/kvasir
+cd kvasir
 make env      # writes .env; then set STRATA_DATA_DIR
 make key
 make test

@@ -1,4 +1,7 @@
 # GPU access comes from an override in compose/, picked by GPU_VENDOR in .env.
+# A fixed project name keeps `make down` and `make restart` working on the same
+# container whatever the checkout directory is called.
+name: kvasir
 services:
   strata:
     # Pinned on purpose: the image only changes when this tag does.

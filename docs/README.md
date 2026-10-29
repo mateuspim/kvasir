@@ -1,6 +1,6 @@
-# local-llm-stack documentation
+# Kvasir documentation
 
-## Use local-llm-stack
+## Use Kvasir
 
 - [README](../README.md): quick start, features and everyday commands.
 - [Choose hardware and a model](guide/hardware.md): what fits your GPU and RAM.
@@ -10,7 +10,7 @@
 - [Security and privileges](../SECURITY.md).
 - [Brand assets](branding.md).
 
-## Develop local-llm-stack
+## Develop Kvasir
 
 - [Architecture](architecture.md): components and data flow.
 - [Architecture decisions](adr/README.md): durable tradeoffs.

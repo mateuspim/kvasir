@@ -3,8 +3,8 @@
 ## Set up
 
 ```sh
-git clone https://github.com/mateuspim/local-llm-stack
-cd local-llm-stack
+git clone https://github.com/mateuspim/kvasir
+cd kvasir
 make env            # .env with this machine's key path and render group
 $EDITOR .env        # set STRATA_DATA_DIR
 make key

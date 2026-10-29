@@ -14,13 +14,13 @@ COMPOSE         := $(DOCKER) compose --project-directory $(CURDIR) \
                      --env-file $(CURDIR)/.env -f $(CURDIR)/docker-compose.yml \
                      -f $(CURDIR)/compose/$(GPU_VENDOR).yml
 STRATA_PORT     ?= 8080
-STRATA_KEY_FILE ?= $(HOME)/.config/local-llm/strata.key
+STRATA_KEY_FILE ?= $(HOME)/.config/kvasir/strata.key
 STRATA_IMAGE    ?= ghcr.io/niko1221/strata:0.2.7-cuda13
 ENDPOINT        := http://127.0.0.1:$(STRATA_PORT)
 AUTH             = -H "Authorization: Bearer $$(cat $(STRATA_KEY_FILE))"
 
 help:
-	@printf '%s\n' 'local-llm-stack targets:'
+	@printf '%s\n' 'Kvasir targets:'
 	@printf '  %-14s %s\n' \
 	  'env'        'Create .env for this machine (never overwrites)' \
 	  'key'        'Create the API key file (never overwrites)' \
@@ -46,7 +46,7 @@ lint:
 
 env:
 	@if [ -f .env ]; then echo '.env exists; not overwriting'; else \
-	  sed -e 's|^STRATA_KEY_FILE=.*|STRATA_KEY_FILE=$(HOME)/.config/local-llm/strata.key|' \
+	  sed -e 's|^STRATA_KEY_FILE=.*|STRATA_KEY_FILE=$(HOME)/.config/kvasir/strata.key|' \
 	      -e "s|^RENDER_GID=.*|RENDER_GID=$$(getent group render | cut -d: -f3)|" \
 	      .env.example > .env && \
 	  echo 'wrote .env -- now set STRATA_DATA_DIR to an absolute path on NVMe'; fi

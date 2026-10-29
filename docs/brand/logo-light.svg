@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="256" viewBox="0 0 1240 256" role="img" aria-label="local-llm-stack">
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="256" viewBox="0 0 900 256" role="img" aria-label="Kvasir">
 <!-- The icon paths are inlined so the logo renders standalone; keep them in sync with icon.svg. -->
 <rect x="5" y="5" width="246" height="246" rx="48" fill="#171328" stroke="#7a52d6" stroke-width="6"/>
 <g fill="none" stroke-linecap="round" stroke-linejoin="round">
@@ -7,5 +7,5 @@
   <path d="M50 130 128 172 206 130" stroke="#8f6ae6" stroke-width="16"/>
   <path d="M50 166 128 208 206 166" stroke="#6a4bb8" stroke-width="16"/>
 </g>
-<text x="300" y="164" font-family="JetBrainsMono Nerd Font,JetBrains Mono,monospace" font-size="104" font-weight="700" letter-spacing="-3" fill="#1a1530">local-llm-<tspan fill="#7a52d6">stack</tspan></text>
+<text x="300" y="170" font-family="JetBrainsMono Nerd Font,JetBrains Mono,monospace" font-size="150" font-weight="700" letter-spacing="-4" fill="#7a52d6">Kvasir</text>
 </svg>

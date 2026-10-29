@@ -11,7 +11,7 @@ labels: bug
 **Steps to reproduce**
 
 **Versions**
-- local-llm-stack commit or release:
+- Kvasir commit or release:
 - `STRATA_IMAGE`, `GPU_VENDOR`, `MODEL`, `CONTEXT` from `.env`:
 - GPU, VRAM, system RAM, driver version:
 - Docker and Compose versions (`docker version`, `docker compose version`):

@@ -1,4 +1,8 @@
-# local-llm-stack brand assets
+# Kvasir brand assets
+
+Kvasir is the wisest being in Norse myth, made when the gods pooled their
+knowledge into one. The name fits a mixture-of-experts model: one answer
+drawn from 512 experts per layer.
 
 The mark is three stacked layers with a terminal prompt on the top one. The
 layers stand for where the model lives while it serves: VRAM, system RAM and
@@ -23,8 +27,8 @@ The logo SVGs and the preview inline the mark so they render standalone; keep
 the paths in sync when changing the icon. Wordmarks use live SVG text in
 JetBrainsMono Nerd Font, so the font can vary where it is not installed.
 
-Keep clear space around the mark, and the wordmark in lower case:
-**local-llm-stack**. This project has no UI to capture: the hero's terminal
+Keep clear space around the mark, and the wordmark as one word with a capital
+K: **Kvasir**, set entirely in the accent colour. This project has no UI to capture: the hero's terminal
 cards are drawn from real command output. The
 [development runbook](runbooks/development.md#refresh-the-preview) explains
 how to update and re-render them.

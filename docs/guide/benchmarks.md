@@ -57,7 +57,7 @@ The gateway runs on the host side of the sandbox, so the key never enters it.
 Then, from the benchmark checkout:
 
 ```sh
-BENCH_API_KEY=$(cat ~/.config/local-llm/strata.key) python3 bench/hard_canary.py \
+BENCH_API_KEY=$(cat ~/.config/kvasir/strata.key) python3 bench/hard_canary.py \
   --base-url http://127.0.0.1:8080/v1 --model qwen3.8-flash-next-q2_0 \
   --provider strata-docker --label my-run --output results/hard/my-run
 ```
