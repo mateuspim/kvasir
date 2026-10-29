@@ -1,0 +1,12 @@
+# AMD override, from Strata's documented `docker run` for ROCm images. Pick the
+# image for your card in .env (e.g. 0.2.7-rocm-gfx120x for RX 9000). Not yet
+# tested on AMD hardware by this project.
+services:
+  strata:
+    devices:
+      - /dev/kfd
+      - /dev/dri
+    group_add:
+      - video
+      # Numeric: the host's render group name does not exist inside the image.
+      - "${RENDER_GID:?set RENDER_GID in .env (make env fills it)}"

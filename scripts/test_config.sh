@@ -11,6 +11,8 @@
 #   - the image drifting to a floating tag (latest-*), so a restart silently
 #     changes the engine under a tuned preset
 #   - model data put in a named volume, which lands ~105 GB on the root disk
+#   - a GPU override that no longer renders, or that drops one of the above
+#   - the owner's paths or mount names leaking into a public repo
 set -uo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -25,26 +27,30 @@ info() { printf '  \033[33m ..  \033[0m %s\n' "$*"; }
 
 echo "config tests"
 
-# --- 1. compose renders, and the rendered result is what we expect ---------
-rendered=""
+# --- 1. compose renders with each GPU override, and the result is safe ------
+# Query the normalised JSON rather than grepping YAML, whose layout compose is
+# free to change between versions. RENDER_GID is only needed by the AMD file.
 if command -v docker >/dev/null 2>&1; then
-  rendered=$(docker compose --project-directory "$REPO_DIR" --env-file "$ENV_FILE" \
-               -f "$COMPOSE_FILE" config --format json 2>/dev/null) || rendered=""
-fi
+  for vendor_file in "${REPO_DIR}"/compose/*.yml; do
+    vendor=$(basename "$vendor_file" .yml)
+    rendered=$(RENDER_GID=990 docker compose --project-directory "$REPO_DIR" \
+                 --env-file "$ENV_FILE" -f "$COMPOSE_FILE" -f "$vendor_file" \
+                 config --format json 2>/dev/null) || rendered=""
+    if [ -z "$rendered" ]; then bad "[$vendor] compose does not render"; continue; fi
+    check() { printf '%s' "$rendered" | python3 -c "import json,sys; s=json.load(sys.stdin)['services']['strata']; sys.exit(0 if ($1) else 1)"; }
 
-if [ -n "$rendered" ]; then
-  ok "docker-compose.yml validates"
-  # Query the normalised JSON rather than grepping YAML, whose layout compose
-  # is free to change between versions.
-  check() { printf '%s' "$rendered" | python3 -c "import json,sys; s=json.load(sys.stdin)['services']['strata']; sys.exit(0 if ($1) else 1)"; }
+    if check "s.get('ports') and all(p.get('host_ip') == '127.0.0.1' for p in s['ports'])"; then
+      ok "[$vendor] renders, endpoint on loopback only"
+    else bad "[$vendor] endpoint is NOT restricted to 127.0.0.1"; fi
 
-  if check "all(p.get('host_ip') == '127.0.0.1' for p in s.get('ports', []))"; then
-    ok "endpoint published on loopback only"
-  else bad "endpoint is NOT restricted to 127.0.0.1"; fi
+    if check "any(v['target'] == '/data' and v['type'] == 'bind' for v in s.get('volumes', []))"; then
+      ok "[$vendor] /data is a bind mount (model stays off the root disk)"
+    else bad "[$vendor] /data is not a bind mount -- a named volume puts ~105 GB on /"; fi
 
-  if check "any(v['target'] == '/data' and v['type'] == 'bind' for v in s.get('volumes', []))"; then
-    ok "/data is a bind mount (model stays off the root disk)"
-  else bad "/data is not a bind mount -- a named volume puts ~105 GB on /"; fi
+    if check "s.get('gpus') or s.get('devices')"; then
+      ok "[$vendor] gives the container a GPU"
+    else bad "[$vendor] grants no GPU access"; fi
+  done
 else
   info "docker compose unavailable, skipping compose checks"
 fi
@@ -82,7 +88,7 @@ if [ -f "${REPO_DIR}/.env" ]; then
     [ "$mode" = 600 ] && ok "key file is mode 600" || bad "key file is mode $mode, want 600"
   else info "no key file yet (make key)"; fi
 else
-  info "no .env yet, skipping local checks (cp .env.example .env)"
+  info "no .env yet, skipping local checks (make env)"
 fi
 
 # --- 5. scripts are syntactically valid -------------------------------------
@@ -95,6 +101,16 @@ for f in "${REPO_DIR}"/scripts/*.py; do
     || { bad "python syntax error in $(basename "$f")"; sh_bad=1; }
 done
 [ "$sh_bad" = 0 ] && ok "all scripts parse"
+
+# --- 6. nothing machine-specific in tracked files --------------------------
+# The repo is public and meant to run on other machines. /home/you is the
+# documented placeholder.
+if git -C "$REPO_DIR" rev-parse >/dev/null 2>&1; then
+  leaks=$(git -C "$REPO_DIR" grep -nIE '/home/[a-z_][a-z0-9_-]*' -- . ':!scripts/test_config.sh' \
+            | grep -v '/home/you' || true)
+  if [ -z "$leaks" ]; then ok "no personal home paths in tracked files"
+  else bad "personal paths in tracked files:"; printf '%s\n' "$leaks" | sed 's/^/       /'; fi
+fi
 
 printf '\n%d passed, %d failed\n' "$pass" "$fail"
 [ "$fail" -eq 0 ]

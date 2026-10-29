@@ -1,3 +1,4 @@
+# GPU access comes from an override in compose/, picked by GPU_VENDOR in .env.
 services:
   strata:
     # Pinned on purpose: the image only changes when this tag does.
@@ -8,7 +9,6 @@ services:
       # Loopback only. Strata always requires an API key, but there is still no
       # reason to offer the endpoint to the LAN.
       - "127.0.0.1:${STRATA_PORT:-8080}:8080"
-    gpus: all
     environment:
       FAMILY: ${FAMILY:-qwen}
       MODEL: ${MODEL:-Q2_0}
@@ -23,7 +23,8 @@ services:
     volumes:
       # Bind mount, not a named volume: model plus prepared pack is ~105 GB and
       # named volumes live on the root disk. Keep it on NVMe -- Strata reads the
-      # 29 GB lookup shard from here while generating, not just at load.
+      # 29 GB lookup shard from here while generating, not just at load
+      # (docs/adr/0005).
       - ${STRATA_DATA_DIR:?set STRATA_DATA_DIR in .env}:/data
     ulimits:
       memlock: { soft: -1, hard: -1 }   # the engine pins tens of GB of RAM

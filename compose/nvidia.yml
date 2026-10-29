@@ -1,0 +1,5 @@
+# NVIDIA override: RTX 20-50 with driver 580+ on the cuda13 image, Pascal/Volta
+# or driver 575-579 on cuda12. Needs nvidia-container-toolkit on the host.
+services:
+  strata:
+    gpus: all
