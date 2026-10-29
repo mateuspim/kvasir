@@ -5,10 +5,15 @@
 -include .env
 export
 
-# pkexec by default: joining the docker group is root-equivalent (docs/adr/0003).
-# pkexec drops the environment, so compose is given absolute paths and reads its
-# variables from .env, never from the shell. Override DOCKER in .env.
-DOCKER          ?= pkexec docker
+# How to reach docker (docs/adr/0008): as-is when it already works for this user
+# (docker group, rootless docker), else through pkexec, else sudo. Set DOCKER
+# in .env to force one. pkexec and sudo reset the environment, so compose is
+# given absolute paths and reads its variables from .env, never from the shell.
+ifndef DOCKER
+DOCKER := $(shell if docker info >/dev/null 2>&1; then echo docker; \
+            elif command -v pkexec >/dev/null 2>&1; then echo pkexec docker; \
+            else echo sudo docker; fi)
+endif
 GPU_VENDOR      ?= nvidia
 COMPOSE         := $(DOCKER) compose --project-directory $(CURDIR) \
                      --env-file $(CURDIR)/.env -f $(CURDIR)/docker-compose.yml \
@@ -20,7 +25,7 @@ ENDPOINT        := http://127.0.0.1:$(STRATA_PORT)
 AUTH             = -H "Authorization: Bearer $$(cat $(STRATA_KEY_FILE))"
 
 help:
-	@printf '%s\n' 'Kvasir targets:'
+	@printf '%s\n' 'Kvasir targets (docker via: $(DOCKER)):'
 	@printf '  %-14s %s\n' \
 	  'env'        'Create .env for this machine (never overwrites)' \
 	  'key'        'Create the API key file (never overwrites)' \

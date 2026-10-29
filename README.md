@@ -40,7 +40,8 @@ Then [connect opencode](docs/guide/opencode.md) or any OpenAI client to
   image. AMD is untested.
 - Endpoint on loopback only, always keyed; the key reaches the container as a
   compose secret.
-- No docker group: docker runs through `pkexec` by default.
+- Uses docker the way you already run it: plain, `pkexec` or `sudo`, detected.
+  Nobody has to join the docker group.
 - `make bench` and `make curl-test` to check speed and tool calling
   ([benchmarks](docs/guide/benchmarks.md)).
 - Offline config tests that run in CI and as a pre-commit hook.
@@ -67,7 +68,9 @@ Nothing else was installed on the host.
 
 ## Security and privileges
 
-Docker commands run as root through `pkexec`; nothing else here needs root.
+Docker commands run with docker's usual root privileges: directly if you
+already have docker access, otherwise through `pkexec` or `sudo`. Nothing else
+here needs root.
 The container sees the GPU, the data directory and the key file. The endpoint
 listens on `127.0.0.1` and rejects requests without the key. The first start
 downloads model files from Hugging Face. Full privilege model:

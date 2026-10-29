@@ -28,7 +28,7 @@ pre-commit hook and CI. It renders `docker-compose.yml` with every file in
 | the override grants a GPU | a vendor file that silently runs on nothing |
 | image pinned in compose and `.env.example` | a floating `latest-*` tag |
 | key only via `/run/secrets` | a key in compose or `.env.example` |
-| `.env` paths absolute, key file 0600 | `~` under pkexec; a readable key |
+| `.env` paths absolute, key file 0600 | `~` under pkexec or sudo; a readable key |
 | scripts parse | syntax errors |
 | no home paths in tracked files | the owner's paths leaking into the public repo |
 

@@ -16,9 +16,11 @@ what the contracts are, `docs/guide/` how to use each piece.
 - Naming: compose project `kvasir`; container and compose service `strata`; variables are the ones in
   `.env.example` and [docs/specs/configuration.md](docs/specs/configuration.md);
   model ids are `qwen3.8-flash-next-<model lowercased>`.
-- Docker only through `$(DOCKER)`, default `pkexec docker`. Never add a user to
-  the `docker` group or tell anyone to (ADR 3). pkexec resets the environment,
-  so every path compose sees must be absolute and come from `.env`.
+- Docker only through `$(DOCKER)`, which the Makefile detects: plain `docker`
+  when it already works, else `pkexec docker`, else `sudo docker` (ADR 8).
+  Never tell anyone to join the `docker` group to make the stack work; it is
+  root-equivalent. pkexec and sudo reset the environment, so every path
+  compose sees must be absolute and come from `.env`.
 - The endpoint stays on `127.0.0.1` and always requires the key, which reaches
   the container only as a compose secret (ADR 4).
 - Model data is a bind mount on NVMe, never a named volume (ADR 5).

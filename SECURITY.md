@@ -20,9 +20,11 @@ This repository is configuration: a compose file, a Makefile and two scripts.
 What runs with which rights:
 
 - **Root on the host:** every `docker` command, through `$(DOCKER)`. The
-  default `pkexec docker` asks for authentication each time instead of adding
-  you to the `docker` group, which is root-equivalent
-  ([ADR 3](docs/adr/0003-reach-docker-through-pkexec.md)).
+  Makefile uses plain `docker` when you already have access (the `docker`
+  group or rootless docker), and otherwise asks for authentication through
+  `pkexec` or `sudo` each time. It never adds anyone to the `docker` group,
+  which is root-equivalent
+  ([ADR 8](docs/adr/0008-detect-how-to-reach-docker.md)).
 - **In the container:** the official `ghcr.io/niko1221/strata` image, pinned
   to a release tag. It runs as root inside the container, with access to the
   GPU, the data directory, and the key file mounted read-only as a secret.

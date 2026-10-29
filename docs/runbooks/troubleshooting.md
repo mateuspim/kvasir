@@ -4,11 +4,12 @@ Each entry: what you see, why, and the fix.
 
 ## `permission denied while trying to connect to the docker API`
 
-**Cause:** docker was called directly as your user, outside the Makefile.
-**Fix:** use the make targets, which run docker as `$(DOCKER)` (default
-`pkexec docker`). Do not add yourself to the `docker` group to make this go
-away ([ADR 3](../adr/0003-reach-docker-through-pkexec.md)). Without polkit,
-set `DOCKER=sudo docker` in `.env`.
+**Cause:** docker was called as your user without docker access, either
+directly or because `.env` forces `DOCKER=docker`.
+**Fix:** use the make targets and leave `DOCKER` unset, so the Makefile picks
+`pkexec docker` or `sudo docker` for you; `make help` shows which. Joining the
+`docker` group also works, but it is root-equivalent
+([ADR 8](../adr/0008-detect-how-to-reach-docker.md)).
 
 ## `set STRATA_DATA_DIR in .env` / `STRATA_DATA_DIR does not exist`
 
@@ -19,8 +20,8 @@ directory.
 
 ## Compose cannot find the key file, or `~/…` paths fail
 
-**Cause:** pkexec resets the environment, so `~` and `$HOME` in `.env` are
-not expanded.
+**Cause:** pkexec and sudo reset the environment, so `~` and `$HOME` in
+`.env` are not expanded.
 **Fix:** absolute paths only. `make env` writes them; `make test` flags
 relative ones.
 

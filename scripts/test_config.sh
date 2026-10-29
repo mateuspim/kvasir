@@ -71,7 +71,7 @@ elif grep -qE 'API_KEY_FILE:\s*/run/secrets/' "$COMPOSE_FILE"; then
   ok "API key passed as a compose secret, not an env var"
 else bad "compose does not read the key from /run/secrets"; fi
 
-# --- 4. the local .env, if there is one, is usable through pkexec -----------
+# --- 4. the local .env, if there is one, is usable through pkexec or sudo ---
 if [ -f "${REPO_DIR}/.env" ]; then
   # Read raw values: sourcing would expand ~ and hide exactly the mistake
   # this check exists for.
@@ -80,7 +80,7 @@ if [ -f "${REPO_DIR}/.env" ]; then
     printf -v "$var" '%s' "$val"
     case "$val" in
       /*) ok "$var is absolute" ;;
-      *)  bad "$var must be an absolute path (pkexec does not expand ~ or \$HOME): '$val'" ;;
+      *)  bad "$var must be an absolute path (pkexec and sudo do not expand ~ or \$HOME): '$val'" ;;
     esac
   done
   if [ -f "${STRATA_KEY_FILE:-}" ]; then

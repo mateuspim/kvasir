@@ -44,8 +44,8 @@
     <circle cx="250" cy="1292" r="11" fill="#b48cff"/><text x="280" y="1304">opencode-ready</text>
     <rect x="624" y="1240" width="353" height="104" fill="#101b22" stroke="#35454d" stroke-width="3"/>
     <circle cx="666" cy="1292" r="11" fill="#b48cff"/><text x="696" y="1304">NVIDIA + AMD</text>
-    <rect x="999" y="1240" width="414" height="104" fill="#101b22" stroke="#35454d" stroke-width="3"/>
-    <circle cx="1041" cy="1292" r="11" fill="#b48cff"/><text x="1071" y="1304">No docker group</text>
+    <rect x="999" y="1240" width="434" height="104" fill="#101b22" stroke="#35454d" stroke-width="3"/>
+    <circle cx="1041" cy="1292" r="11" fill="#b48cff"/><text x="1071" y="1304">Keyed + loopback</text>
   </g>
   <rect x="208" y="1460" width="1260" height="152" fill="#0b1218" stroke="#3c505c" stroke-width="3"/>
   <text x="263" y="1558" font-size="60" fill="#b48cff">$</text>
