@@ -85,7 +85,8 @@ if [ -f "${REPO_DIR}/.env" ]; then
   done
   if [ -f "${STRATA_KEY_FILE:-}" ]; then
     mode=$(stat -c '%a' "$STRATA_KEY_FILE")
-    [ "$mode" = 600 ] && ok "key file is mode 600" || bad "key file is mode $mode, want 600"
+    if [ "$mode" = 600 ]; then ok "key file is mode 600"
+    else bad "key file is mode $mode, want 600"; fi
   else info "no key file yet (make key)"; fi
 else
   info "no .env yet, skipping local checks (make env)"
